@@ -72,9 +72,9 @@ Existing query parameter will be replace if register same key query parameter on
     import  'url_builder.dart';
 
 	abstract  class  ApiServiceItemPath {
-		static  String  get  _root => "items";
-		static  String  get  _lists => _root;
-		static  String  get  _detail => "items/{id}";
+		static  const String  get  _root = "items";
+		static  const String  get  _lists = _root;
+		static  const String  get  _detail = "items/{id}";
 
 	}
 
