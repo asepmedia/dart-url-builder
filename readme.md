@@ -20,8 +20,8 @@
     Result will be : "api.com/post/hot-news-article"
 
 ## Query Bindings
+By default if register queryBindings will append to url.
 ### Basic Example : 
-	By default if register queryBindings will append to url.
     var url = "api.com/post";
     final urlBuilder = UrlBuilder.parse(url, queryBindings: 
 	    {
