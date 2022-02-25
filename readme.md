@@ -9,6 +9,8 @@
 	    }
     );
 
+    Result : "api.com/post/hot-news-article"
+
 #### Example  with Colon  : 
     var url = "api.com/post/:slug";
     final urlBuilder = UrlBuilder.parse(url, pathBindings: 
@@ -17,7 +19,7 @@
 	    }
     );
     
-    Result will be : "api.com/post/hot-news-article"
+    Result : "api.com/post/hot-news-article"
 
 ## Query Bindings
 ### Basic Example : 
