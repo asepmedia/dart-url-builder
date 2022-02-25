@@ -69,6 +69,8 @@ class UrlBuilder {
           currentKey = currentKey.replaceAll(currentValue, "");
           currentValue = currentValue.replaceAll("=", "");
         }
+
+        // override value based on queryBindings value
         if (_queryBindings != null && _queryBindings.containsKey(currentKey)) {
           currentValue = _queryBindings[currentKey].toString();
         }
@@ -76,7 +78,7 @@ class UrlBuilder {
       },
     );
 
-    // override query parameter based on queryBindings value
+    // override query parameter based on queryBindings key & value
     if (_queryBindings != null) {
       _queryBindings.map((k, v) {
         if (!queryParameters.contains(k)) {
