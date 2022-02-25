@@ -1,14 +1,14 @@
 class UrlBuilder {
-  static String _url = "";
+  static String? _url = "";
   static dynamic _pathBindings;
   static dynamic _queryBindings;
-  static RegExp _FindAndSymbolAtEnd = RegExp(r'\&+$');
-  static RegExp _findOnlyQueryParameterRegex = RegExp(r'(?:\?.*)');
-  static RegExp _findQuestionSymbolRegex = RegExp(r'(?:\?)');
-  static RegExp _findValueQueryParameterRegex = RegExp(r'(?:\=.*)');
-  static RegExp _findPathParameterRegex =
+  static RegExp? _FindAndSymbolAtEnd = RegExp(r'\&+$');
+  static RegExp? _findOnlyQueryParameterRegex = RegExp(r'(?:\?.*)');
+  static RegExp? _findQuestionSymbolRegex = RegExp(r'(?:\?)');
+  static RegExp? _findValueQueryParameterRegex = RegExp(r'(?:\=.*)');
+  static RegExp? _findPathParameterRegex =
       RegExp(r'(?:\{[a-zA-Z]+})|(?:\:[a-zA-Z]+)');
-  static RegExp _findPathParameterValueRegex = RegExp(r'(?:\:)|(?:\{|})');
+  static RegExp? _findPathParameterValueRegex = RegExp(r'(?:\:)|(?:\{|})');
 
   static String parse(String url,
       {dynamic pathBindings, dynamic queryBindings}) {
@@ -25,36 +25,38 @@ class UrlBuilder {
     if (_queryBindings != null) {
       _url = queryBindings();
     }
-    return _url;
+    return _url!;
   }
 
   static String pathBindings() {
     if (_pathBindings != null) {
-      Iterable<Match> matches = _findPathParameterRegex.allMatches(_url);
+      Iterable<Match> matches = _findPathParameterRegex!.allMatches(_url!);
       List<Match> listOfMatches = matches.toList();
 
       listOfMatches.forEach((e) {
         var rawKey = e.group(0).toString();
-        var key = rawKey.replaceAll(_findPathParameterValueRegex, "");
+        var key = rawKey.replaceAll(_findPathParameterValueRegex!, "");
         if (_pathBindings.containsKey(key)) {
-          _url = _url.replaceAll(rawKey, _pathBindings[key]);
+          _url = _url!.replaceAll(rawKey, _pathBindings[key]);
         }
       });
     }
-    return _url;
+    return _url!;
   }
 
   static String queryBindings() {
-    final hasQuestionSymbol = _findQuestionSymbolRegex.hasMatch(_url);
+    final hasQuestionSymbol = _findQuestionSymbolRegex!.hasMatch(_url!);
 
     // append symbol "?" if doesnt have
     if (!hasQuestionSymbol) {
-      _url += "?";
+      if (_url != null) {
+        _url = _url! + "?";
+      }
     }
 
     var queryParameters = "";
     var onlyQueryparameter =
-        _findOnlyQueryParameterRegex.stringMatch(_url).toString();
+        _findOnlyQueryParameterRegex!.stringMatch(_url!).toString();
 
     var onlyQueryparameterSplits =
         onlyQueryparameter.split("&").where((e) => e != "?");
@@ -62,8 +64,8 @@ class UrlBuilder {
     // append and override query value on path if register queryBindings
     onlyQueryparameterSplits.forEach(
       (e) {
-        var currentKey = e.replaceAll(_findQuestionSymbolRegex, "");
-        var currentValue = _findValueQueryParameterRegex.stringMatch(e) ?? "";
+        var currentKey = e.replaceAll(_findQuestionSymbolRegex!, "");
+        var currentValue = _findValueQueryParameterRegex!.stringMatch(e) ?? "";
 
         if (currentValue != null) {
           currentKey = currentKey.replaceAll(currentValue, "");
@@ -88,8 +90,9 @@ class UrlBuilder {
       });
     }
 
-    queryParameters = queryParameters.replaceAll(_FindAndSymbolAtEnd, "");
+    queryParameters = queryParameters.replaceAll(_FindAndSymbolAtEnd!, "");
 
-    return _url.replaceAll(_findOnlyQueryParameterRegex, "?") + queryParameters;
+    return _url!.replaceAll(_findOnlyQueryParameterRegex!, "?") +
+        queryParameters;
   }
 }
