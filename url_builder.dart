@@ -2,10 +2,13 @@ class UrlBuilder {
   static String _url = "";
   static dynamic _pathBindings;
   static dynamic _queryBindings;
-  static RegExp _FindSymbolAndAtEnd = RegExp(r'\&+$');
+  static RegExp _FindAndSymbolAtEnd = RegExp(r'\&+$');
   static RegExp _findOnlyQueryParameterRegex = RegExp(r'(?:\?.*)');
-  static RegExp _findQuestionMarkRegex = RegExp(r'(?:\?)');
+  static RegExp _findQuestionSymbolRegex = RegExp(r'(?:\?)');
   static RegExp _findValueQueryParameterRegex = RegExp(r'(?:\=.*)');
+  static RegExp _findPathParameterRegex =
+      RegExp(r'(?:\{[a-zA-Z]+})|(?:\:[a-zA-Z]+)');
+  static RegExp _findPathParameterValueRegex = RegExp(r'(?:\:)|(?:\{|})');
 
   static String parse(String url,
       {dynamic pathBindings, dynamic queryBindings}) {
@@ -27,19 +30,25 @@ class UrlBuilder {
 
   static String pathBindings() {
     if (_pathBindings != null) {
-      _pathBindings.map((k, v) {
-        final replaceValue = v.toString();
-        _url = _url.replaceAll("{${k}}", replaceValue);
-        _url = _url.replaceAll(":${k}", replaceValue);
-        return MapEntry(v, k);
+      Iterable<Match> matches = _findPathParameterRegex.allMatches(_url);
+      List<Match> listOfMatches = matches.toList();
+
+      listOfMatches.forEach((e) {
+        var rawKey = e.group(0).toString();
+        var key = rawKey.replaceAll(_findPathParameterValueRegex, "");
+        if (_pathBindings.containsKey(key)) {
+          _url = _url.replaceAll(rawKey, _pathBindings[key]);
+        }
       });
     }
     return _url;
   }
 
   static String queryBindings() {
-    final hasQuestionMark = _findQuestionMarkRegex.hasMatch(_url);
-    if (!hasQuestionMark) {
+    final hasQuestionSymbol = _findQuestionSymbolRegex.hasMatch(_url);
+
+    // append symbol "?" if doesnt have
+    if (!hasQuestionSymbol) {
       _url += "?";
     }
 
@@ -50,10 +59,10 @@ class UrlBuilder {
     var onlyQueryparameterSplits =
         onlyQueryparameter.split("&").where((e) => e != "?");
 
-    // appends and override query value on path if register queryBindings
+    // append and override query value on path if register queryBindings
     onlyQueryparameterSplits.forEach(
       (e) {
-        var currentKey = e.replaceAll(_findQuestionMarkRegex, "");
+        var currentKey = e.replaceAll(_findQuestionSymbolRegex, "");
         var currentValue = _findValueQueryParameterRegex.stringMatch(e) ?? "";
 
         if (currentValue != null) {
@@ -67,6 +76,7 @@ class UrlBuilder {
       },
     );
 
+    // override query parameter based on queryBindings value
     if (_queryBindings != null) {
       _queryBindings.map((k, v) {
         if (!queryParameters.contains(k)) {
@@ -76,7 +86,7 @@ class UrlBuilder {
       });
     }
 
-    queryParameters = queryParameters.replaceAll(_FindSymbolAndAtEnd, "");
+    queryParameters = queryParameters.replaceAll(_FindAndSymbolAtEnd, "");
 
     return _url.replaceAll(_findOnlyQueryParameterRegex, "?") + queryParameters;
   }
