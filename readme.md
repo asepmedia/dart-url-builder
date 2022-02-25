@@ -9,8 +9,6 @@
 	    }
     );
 
-    Result : "api.com/post/hot-news-article"
-
 #### Example  with Colon  : 
     var url = "api.com/post/:slug";
     final urlBuilder = UrlBuilder.parse(url, pathBindings: 
@@ -19,7 +17,7 @@
 	    }
     );
     
-    Result : "api.com/post/hot-news-article"
+    Result will be : "api.com/post/hot-news-article"
 
 ## Query Bindings
 ### Basic Example : 
@@ -68,3 +66,27 @@ Existing query parameter will be replace if register same key query parameter on
     );
     
     Result : "api.com/post?slug=hot-news-article&user=1&region=id-ID"
+
+## Structure Recommendation
+
+    import  'url_builder.dart';
+
+	abstract  class  ApiServiceItemPath {
+		static  String  get  _root => "items";
+		static  String  get  _lists => _root;
+		static  String  get  _detail => "items/{id}";
+
+	}
+
+	class  ApiServiceItem {
+		ApiServiceItem();
+		
+		static  String  list() {
+			return  ApiServiceItemPath._lists;
+		}
+
+		static  String  detail({required  int  id}) {
+			return  UrlBuilder.parse(ApiServiceItemPath._detail,
+				pathBindings: {'id': id});
+		}
+	}
