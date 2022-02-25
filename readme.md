@@ -90,3 +90,7 @@ Existing query parameter will be replace if register same key query parameter on
 				pathBindings: {'id': id});
 		}
 	}
+
+	ApiServiceItem.detail(id: 2);
+
+	Result = "/items/2"
