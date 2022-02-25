@@ -2,10 +2,10 @@ class UrlBuilder {
   static String _url = "";
   static dynamic _pathBindings;
   static dynamic _queryBindings;
-  static RegExp _removeAndSysmbolAtEnd = RegExp(r'\&+$');
-  static RegExp _onlyQueryParameterRegex = RegExp(r'(?:\?.*)');
-  static RegExp _questionMarkRegex = RegExp(r'(?:\?)');
-  static RegExp _valueQueryParameterRegex = RegExp(r'(?:\=.*)');
+  static RegExp _FindSymbolAndAtEnd = RegExp(r'\&+$');
+  static RegExp _findOnlyQueryParameterRegex = RegExp(r'(?:\?.*)');
+  static RegExp _findQuestionMarkRegex = RegExp(r'(?:\?)');
+  static RegExp _findValueQueryParameterRegex = RegExp(r'(?:\=.*)');
 
   static String parse(String url,
       {dynamic pathBindings, dynamic queryBindings}) {
@@ -38,14 +38,14 @@ class UrlBuilder {
   }
 
   static String queryBindings() {
-    final hasQuestionMark = _questionMarkRegex.hasMatch(_url);
+    final hasQuestionMark = _findQuestionMarkRegex.hasMatch(_url);
     if (!hasQuestionMark) {
       _url += "?";
     }
 
     var queryParameters = "";
     var onlyQueryparameter =
-        _onlyQueryParameterRegex.stringMatch(_url).toString();
+        _findOnlyQueryParameterRegex.stringMatch(_url).toString();
 
     var onlyQueryparameterSplits =
         onlyQueryparameter.split("&").where((e) => e != "?");
@@ -53,8 +53,8 @@ class UrlBuilder {
     // appends and override query value on path if register queryBindings
     onlyQueryparameterSplits.forEach(
       (e) {
-        var currentKey = e.replaceAll(_questionMarkRegex, "");
-        var currentValue = _valueQueryParameterRegex.stringMatch(e) ?? "";
+        var currentKey = e.replaceAll(_findQuestionMarkRegex, "");
+        var currentValue = _findValueQueryParameterRegex.stringMatch(e) ?? "";
 
         if (currentValue != null) {
           currentKey = currentKey.replaceAll(currentValue, "");
@@ -76,8 +76,8 @@ class UrlBuilder {
       });
     }
 
-    queryParameters = queryParameters.replaceAll(_removeAndSysmbolAtEnd, "");
+    queryParameters = queryParameters.replaceAll(_FindSymbolAndAtEnd, "");
 
-    return _url.replaceAll(_onlyQueryParameterRegex, "?") + queryParameters;
+    return _url.replaceAll(_findOnlyQueryParameterRegex, "?") + queryParameters;
   }
 }
